@@ -1,10 +1,12 @@
 
 //Don't forget that coordinate system is (y,x) first
 
-//Difference between move and wmove?
+//Difference between move and wmove: Move only uses the default window wmove can use anything else
 
 //https://www.youtube.com/watch?v=A5lX1h_2zy0
-//mvprintw may be useful
+//mvprintw may be useful (y,x,"%d",c,) goes to a place and prints
+//Maybe use conio.h to handle typing
+// User Runs Program -> run display() -> user selects program to open -> File is opened and user should be able to interact with it
 
 #include<stdio.h>
 #include <fcntl.h>
@@ -14,10 +16,20 @@
 #include <sys/stat.h>
 #include <dirent.h>
  //What programs do we need on startup?
+#include <conio.h>
+
+
+//Parses args so that you can run it line should be from stdin
+ void parse_args(char * line, char ** arg_ary){
+
+
+ }
+
 
 
  //Displays all .txt files in the directory runs out startup
  void display(){
+   char s[256];
  //Use while loop with readdir to display
  //Necessario para usando ncurses y otros
  initscr();
@@ -26,7 +38,7 @@
  keypad(stdscr,TRUE);
 
  char* directory;
- directory = getcwd();
+ directory = getcwd(s,256);
 
 
  }
@@ -34,14 +46,45 @@
 
 
 
-//On opening a file will print out
- void open(){
+//Opens a file and prints it out, will this allow it to edit?
+ void open(FILE* f){
+   int windowY = 0;
+   int windowX = 0;
+
+
+   buffer = malloc(sizeof(char)* LINES);
+
+   open(f);
+   //What is the default size of a window?
+
+   //ncurses LINES and COLUMNS
+   printw(f,,256);
+
+
+   do{ //Allows us to move cursor (hopefully) using arrow keys
+     input = getch();
+     if(inputCode ==KEY_UP){
+       move(-1,0);
+     }
+     if(inputCode ==KEY_DOWN){
+       move(1,0);
+     }
+     if(inputCode== KEY_LEFT){
+       move(0,-1);
+     }
+     if(inputCode == KEY_RIGHT){
+       move(0-1);
+     }
+     else{
+       print();
+    }
+    refresh();
+   }
+
 
 
 
  }
-
-
 
 
 
@@ -56,11 +99,6 @@ void append(char s[256],FILE *f){
 //Upon typing the ""
 void exit(){}
 
-//Continuosuly takes the input from stdin and runs the corresponding function
+//Continuosuly takes the input from stdin using fgets and runs the corresponding function
 //Probably using execvp
 void input(){}
-
-
-//Ncurses
-//Start with left to right
-void movingPlaces(){}
