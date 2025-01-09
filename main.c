@@ -16,7 +16,6 @@
 #include <sys/stat.h>
 #include <dirent.h>
  //What programs do we need on startup?
-#include <conio.h>
 
 
 //Parses args so that you can run it line should be from stdin
@@ -51,14 +50,16 @@
    int windowY = 0;
    int windowX = 0;
 
-
+   //Buffer for printing from opened file to screen
    buffer = malloc(sizeof(char)* LINES);
 
    open(f);
    //What is the default size of a window?
+   read(buffer,f,256);
+
 
    //ncurses LINES and COLUMNS
-   printw(f,,256);
+   printw(buffer,256);
 
 
    do{ //Allows us to move cursor (hopefully) using arrow keys
