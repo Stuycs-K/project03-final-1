@@ -5,9 +5,9 @@
 
 //https://www.youtube.com/watch?v=A5lX1h_2zy0
 //mvprintw may be useful (y,x,"%d",c,) goes to a place and prints
-//Maybe use conio.h to handle typing
 // User Runs Program -> run display() -> user selects program to open -> File is opened and user should be able to interact with it
 
+#include <stdlib.h>
 #include<stdio.h>
 #include <fcntl.h>
 #include <unistd.h>
@@ -42,43 +42,51 @@
 
  }
 
-
+//Make size of file buffer max like 8k
 
 
 //Opens a file and prints it out, will this allow it to edit?
- void open(FILE* f){
+ void open(char* f){
    int windowY = 0;
    int windowX = 0;
-
+   char * buffer;
+   char * inputBuffer;
    //Buffer for printing from opened file to screen
-   buffer = malloc(sizeof(char)* LINES);
+   buffer = (char*) malloc(sizeof(char)* LINES);
+   //Buffer for reading from input
+   inputBuffer = (char*) malloc(sizeof(char) *LINES);
 
-   open(f);
-   //What is the default size of a window?
-   read(buffer,f,256);
+ fopen(f, "w+");
+
+//Initial start up just prints everything
+  while (buffer != "\0"){
 
 
-   //ncurses LINES and COLUMNS
-   printw(buffer,256);
+  }
 
 
-   do{ //Allows us to move cursor (hopefully) using arrow keys
+
+
+  while (1) { //Allows us to move cursor (hopefully) using arrow keys
+     char input;
      input = getch();
-     if(inputCode ==KEY_UP){
+     if(input ==KEY_UP){
        move(-1,0);
      }
-     if(inputCode ==KEY_DOWN){
+     if(input ==KEY_DOWN){
        move(1,0);
      }
-     if(inputCode== KEY_LEFT){
+     if(input== KEY_LEFT){
        move(0,-1);
      }
-     if(inputCode == KEY_RIGHT){
-       move(0-1);
+     if(input == KEY_RIGHT){
+       move(0,-1);
      }
      else{
-       print();
-    }
+       printw(input);
+       //Should write in the file using buffer
+
+  }
     refresh();
    }
 
