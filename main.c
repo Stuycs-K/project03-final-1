@@ -25,28 +25,46 @@
  }
 
 
+  //Displays all .txt files in the directory runs out startup
+  void display(){
+    //Setup
+    DIR *dir;
+    struct dirent * currentFile;
 
- //Displays all .txt files in the directory runs out startup
- void display(){
-   char s[256];
- //Use while loop with readdir to display
- //Necessario para usando ncurses y otros
- initscr();
- //So you can use arrow keys and bakcpsace
- //stdscr is the default screen
- keypad(stdscr,TRUE);
+      char s[256];
+      char* directory;
+      directory = getcwd(s,256);
+      opendir(directory);
 
- char* directory;
- directory = getcwd(s,256);
+     struct stat * stat_buffer;
 
+  //Use while loop with readdir to display and for ncurses
+  initscr();
+  //So you can use arrow keys and bakcpsace
+  //stdscr is the default screen
+  keypad(stdscr,TRUE);
+//End of setup
 
- }
+//First opens directory then loops through all the files assining values then prints out
+while(readdir(dir)!=NULL){
+  currentFile = readdir(dir);
+//Get file name from readdir's dirent
+  stat(currentFile->d_name,stat_buffer);
+
+  printf("File Name: %s File Type: %s File Size: %d \n", currentFile->d_name,currentFile->d_type,stat_buffer->st_size);
+
+  }
+}
+
+int main (){
+  display();
+}
 
 //Make size of file buffer max like 8k
 
 
 //Opens a file and prints it out, will this allow it to edit?
- void open(char* f){
+ void opensss(char* f){
    int windowY = 0;
    int windowX = 0;
    char * buffer;
@@ -106,8 +124,8 @@ void append(char s[256],FILE *f){
 }
 
 //Upon typing the ""
-void exit(){}
+void exitFile(){}
 
 //Continuosuly takes the input from stdin using fgets and runs the corresponding function
 //Probably using execvp
-void input(){}
+void inputFile(){}
