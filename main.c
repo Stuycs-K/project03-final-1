@@ -5,8 +5,9 @@
 
 //https://www.youtube.com/watch?v=A5lX1h_2zy0
 //mvprintw may be useful (y,x,"%d",c,) goes to a place and prints
-// User Runs Program -> run display() -> user selects program to open -> File is opened and user should be able to interact with it
+// User Runs Program -> run display() -> user selects program to open -> File is opened and user should be able to interact with it -> user exits file and back to step 1
 
+#include <string.h>
 #include <stdlib.h>
 #include<stdio.h>
 #include <fcntl.h>
@@ -46,6 +47,7 @@ arg_ary[count+1] = NULL;
     DIR *dir;
     struct dirent * currentFile;
 
+
       char s[256];
       char* directory;
       directory = getcwd(s,256);
@@ -60,19 +62,27 @@ arg_ary[count+1] = NULL;
   keypad(stdscr,TRUE);
 //End of setup
 
+
+//This part causes segfault
 //First opens directory then loops through all the files assining values then prints out
-while(readdir(dir)!=NULL){
-  currentFile = readdir(dir);
+while(currentFile == readdir( dir )){
+  printf("0");
+//  currentFile = readdir(dir);
 //Get file name from readdir's dirent
   stat(currentFile->d_name,stat_buffer);
 
-  printf("File Name: %s File Type: %d File Size: %d \n", currentFile->d_name,currentFile->d_type,stat_buffer->st_size);
+  printf("File Name: %s File Type: %d File Size: %ld \n", currentFile->d_name,currentFile->d_type,stat_buffer->st_size);
 
   }
+
 }
 
 int main (){
-  display();
+  //Will be reponsibole for printing and editing and saving to
+  char * editingBuffer = (char *) malloc(sizeof(char)* 8000);
+
+
+
 }
 
 //Make size of file buffer max like 8k
@@ -96,8 +106,6 @@ int main (){
 
 
   }
-
-
 
 
   while (1) { //Allows us to move cursor (hopefully) using arrow keys
@@ -129,20 +137,24 @@ int main (){
  }
 
 
+void offsetAdd(){
+
+
+}
 
 
 
-//Appends s to the end of the file
-void append(char s,char *arg_ary){
 
-
+//Appends s to the end of the file NOT TO THE WINDOW
+//Need to change end
+void append(char s,char x[256]){
 
     int count =0;
-    while(arg_ary[count] != "\0"){
+    while(x[count] != '\0'){
     count +=1;
   }
-  arg_ary[count] = s;
-  arg_ary[count+1]="\0";
+  x[count] = s;
+  x[count+1]='\0';
 
 
 
