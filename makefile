@@ -3,7 +3,7 @@ run: prog
 	@./prog
 clean:
 	rm -f *.o prog
-compile prog: test.o
-	@gcc -o prog test.o -lm -lncurses
-main.o: test.c
-	@gcc -c test.c
+compile prog: main.o
+	@gcc -o prog main.o -lm -lncurses
+main.o: main.c
+	@gcc -c main.c

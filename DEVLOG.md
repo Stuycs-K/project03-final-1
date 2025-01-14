@@ -2,7 +2,7 @@
 
 This document must be updated daily by EACH group member.
 
-## Player 1
+## Albert
 
 ### 1/6/2024- Added File Headers
 Expanded description including how much time was spent on task.
@@ -24,3 +24,8 @@ When testing got these errors, finished append code for when adding at the end o
 /usr/bin/ld: main.c:(.text+0x229): undefined reference to `printw'
 /usr/bin/ld: main.c:(.text+0x230): undefined reference to `stdscr'
 /usr/bin/ld: main.c:(.text+0x238): undefined reference to `wrefresh'
+### 1/13/2024 - Fixed make errors
+-Fixed Previous errors by adding flags to makefile when compiling prog
+-Still have to decide how to handle offset adding
+-Fixed seg fault error for printing out directory code but not getting any results
+- 30-ish minutes spent

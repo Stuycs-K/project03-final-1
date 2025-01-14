@@ -67,7 +67,7 @@ arg_ary[count+1] = NULL;
 
 //This part causes segfault
 //First opens directory then loops through all the files assining values then prints out
-while(currentFile == readdir( dir )){
+while(currentFile == readdir( dir )!=NULL){
   printf("0");
 //  currentFile = readdir(dir);
 //Get file name from readdir's dirent
@@ -127,6 +127,7 @@ int main (){
      }
      else{
        printw(input);
+// put that function here
        //Should write in the file using buffer
 
   }
@@ -139,7 +140,9 @@ int main (){
  }
 
 
-void offsetAdd(){
+void offsetAdd(char input, char* buffer){
+
+
 
 
 }
@@ -162,11 +165,13 @@ void append(char s,char x[256]){
 
 }
 
-//Upon typing the "" automatically
-void exitFile(){
+//Upon typing the "" automatically saves and closes the file
+void exitFile(char*f){
 
 
 
+
+close(f);
 }
 
 // takes the input from stdin using fgets and runs the corresponding function
