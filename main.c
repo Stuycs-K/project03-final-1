@@ -6,6 +6,8 @@
 //https://www.youtube.com/watch?v=A5lX1h_2zy0
 //mvprintw may be useful (y,x,"%d",c,) goes to a place and prints
 // User Runs Program -> run display() -> user selects program to open -> File is opened and user should be able to interact with it -> user exits file and back to step 1
+//Total list of buffers needed: Buffer for printing from file to window, from input to file, 
+
 
 #include <string.h>
 #include <stdlib.h>
