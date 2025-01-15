@@ -3,12 +3,12 @@
 
 ### GROUP NAME HERE
 
-Group Members Here
-       
+Albert Chen
+
 ### Project Description:
 
 Explain what is this project.
-  
+
 ### Instructions:
 
 How does the user install/compile/run the program.

@@ -46,16 +46,14 @@ arg_ary[count+1] = NULL;
   //Displays all .txt files in the directory runs out startup
   void display(){
     //Setup
-    DIR *dir;
+
+    char s[256];
+    char* directory = getcwd(s,256);
+
+    DIR *dir =  opendir(directory);
     struct dirent * currentFile;
 
-
-      char s[256];
-      char* directory;
-      directory = getcwd(s,256);
-      opendir(directory);
-
-     struct stat * stat_buffer;
+    struct stat * stat_buffer;
 
   //Use while loop with readdir to display and for ncurses
   initscr();
@@ -68,8 +66,8 @@ arg_ary[count+1] = NULL;
 //This part causes segfault
 //First opens directory then loops through all the files assining values then prints out
 while(currentFile == readdir( dir )!=NULL){
-  printf("0");
-//  currentFile = readdir(dir);
+//  printf("0");
+  currentFile = readdir(dir);
 //Get file name from readdir's dirent
   stat(currentFile->d_name,stat_buffer);
 
@@ -80,8 +78,16 @@ while(currentFile == readdir( dir )!=NULL){
 }
 
 int main (){
-  //Will be reponsibole for printing and editing and saving to
+  //Will be reponsibole for printing and editing and saving to maybe?
   char * editingBuffer = (char *) malloc(sizeof(char)* 8000);
+  char *inputBuffer;
+  char  * argsArray[255];
+  fgets(inputBuffer,255,stdin);
+  parse_args(inputBuffer,argsArray);
+  display();
+  if (argsArray[0] == "open"){
+    printf("successful");
+  }
 
 
 
@@ -126,7 +132,9 @@ int main (){
        move(0,-1);
      }
      else{
-       printw(input);
+       char s[1];
+       s[0]=input;
+       printw("%s",s);
 // put that function here
        //Should write in the file using buffer
 
@@ -140,14 +148,21 @@ int main (){
  }
 
 
+
+//Done
 void offsetAdd(char input, char* buffer, int currentPos){
-//use plus 2 b/c strlen doesn't count \0
-  buffer[int(strlen(buffer)) +2] = '\0';
-  for (int i = 0; i< (int(strlen(buffer))-currentPos) ;i++){
-    buffer[(int(strlen(buffer))-currentPos) -1] = buffer[(int(strlen(buffer))-currentPos)];
+int len = strlen(buffer);
+
+  buffer[len+2] = '\0';
+  for (int i = len; i>= currentPos ;i--){
+    printf("%d i: %d \n" ,len-currentPos -i,i);
+    printf("Current pair; One in front: %c One that replaces it: %c \n",buffer[(len-currentPos) -i],buffer[len-(currentPos) -(i+1)]);
+    //Should go backwards replacing current with the one before it
+    buffer[i+1] = buffer[i];
 
   }
 buffer[currentPos] = input;
+buffer[len+1]='\0';
 
 }
 
@@ -156,26 +171,26 @@ buffer[currentPos] = input;
 
 //Appends s to the end of the file NOT TO THE WINDOW
 //Need to change end
+//Done
 void append(char s,char x[256]){
-
-    int count =0;
-    while(x[count] != '\0'){
+  int count =0;
+  while(x[count] != '\0'){
     count +=1;
   }
   x[count] = s;
   x[count+1]='\0';
-
-
-
 }
 
-//Upon typing the "" automatically saves and closes the file
+//Upon typing the "" automatically saves changes made from window to file and closes the file
 void exitFile(char*f){
 
 
 
 
-close(f);
+endwin();
+
+
+//close(f);
 }
 
 // takes the input from stdin using fgets and runs the corresponding function
