@@ -29,3 +29,9 @@ When testing got these errors, finished append code for when adding at the end o
 -Still have to decide how to handle offset adding
 -Fixed seg fault error for printing out directory code but not getting any results
 - 30-ish minutes spent
+
+### 1/14/2024 - Finished offset
+  - FInished offset to use -i to iterate backwards instead of math
+  -Just need to finish buffers now
+
+ 1 hour total spent
