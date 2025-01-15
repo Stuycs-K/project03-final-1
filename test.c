@@ -10,20 +10,20 @@
 #include <dirent.h>
 
 void offsetAdd(char input, char* buffer, int currentPos){
-
+  int len = int(strlen(buffer));
 
 
   //use plus 2 b/c strlen doesn't count \0
-    buffer[int(strlen(buffer)) +2] = '\0';
-    for (int i = 0; i< (int(strlen(buffer))-currentPos) ;i++){
-      printf("%d i: %d \n" ,(int(strlen(buffer))-currentPos -i),i);
-      printf("Current pair; One in front: %c One that replaces it: %c \n",buffer[(int(strlen(buffer))-currentPos) -i],buffer[(int(strlen(buffer))-currentPos) -(i+1)]);
+    buffer[len+2] = '\0';
+    for (int i = len; i>= currentPos ;i--){
+      printf("%d i: %d \n" ,len-currentPos -i,i);
+      printf("Current pair; One in front: %c One that replaces it: %c \n",buffer[len-currentPos) -i],buffer[len-(currentPos) -(i+1)]);
       //Should go backwards replacing current with the one before it
-      buffer[(int(strlen(buffer))-currentPos) -i] = buffer[(int(strlen(buffer))-currentPos) -(i+1)];
+      buffer[i+1] = buffer[i];
 
     }
   buffer[currentPos] = input;
-
+  buffer[len+1]='\0';
 
 //  int termPos = 0;
 //  int whereYouPutInput;
