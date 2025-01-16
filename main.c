@@ -46,15 +46,29 @@ arg_ary[count+1] = NULL;
   //Displays all .txt files in the directory runs out startup
   void display(){
     //Setup
-
     char s[256];
     char* directory = getcwd(s,256);
-
     DIR *dir =  opendir(directory);
     struct dirent * currentFile;
 
     struct stat * stat_buffer;
+     stat_buffer = malloc(sizeof(struct stat)*1);
+     //This part causes segfault
+     //First opens directory then loops through all the files assining values then prints out
+     while((currentFile = readdir(dir)) != NULL){
+     //  printf("0");
+       currentFile = readdir(dir);
+     //Get file name from readdir's dirent
+       stat(currentFile->d_name,stat_buffer);
+       printf("xartgas");
+       printf("File Name: %s File Type: %d File Size: %ld \n", currentFile->d_name,currentFile->d_type,stat_buffer->st_size);
 
+       }
+
+
+
+
+printf("Testing1");
   //Use while loop with readdir to display and for ncurses
   initscr();
   //So you can use arrow keys and bakcpsace
@@ -63,17 +77,6 @@ arg_ary[count+1] = NULL;
 //End of setup
 
 
-//This part causes segfault
-//First opens directory then loops through all the files assining values then prints out
-while(currentFile == readdir( dir )!=NULL){
-//  printf("0");
-  currentFile = readdir(dir);
-//Get file name from readdir's dirent
-  stat(currentFile->d_name,stat_buffer);
-
-  printf("File Name: %s File Type: %d File Size: %ld \n", currentFile->d_name,currentFile->d_type,stat_buffer->st_size);
-
-  }
 
 }
 
@@ -81,13 +84,14 @@ int main (){
   //Will be reponsibole for printing and editing and saving to maybe?
   char * editingBuffer = (char *) malloc(sizeof(char)* 8000);
   char *inputBuffer;
-  char  * argsArray[255];
-  fgets(inputBuffer,255,stdin);
-  parse_args(inputBuffer,argsArray);
+//  char  * argsArray[255];
+//  fgets(inputBuffer,255,stdin);
+  printf("x");
+//  parse_args(inputBuffer,argsArray);
   display();
-  if (argsArray[0] == "open"){
-    printf("successful");
-  }
+//  if (argsArray[0] == "open"){
+  //  printf("successful");
+//  }
 
 
 
@@ -97,7 +101,7 @@ int main (){
 
 
 //Opens a file and prints it out, will this allow it to edit?
- void opensss(char* f){
+ void opensss(char* f, char*fileString){
    //Initial start up just prints everything
    int windowY = 0;
    int windowX = 0;
