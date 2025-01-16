@@ -52,6 +52,7 @@ arg_ary[count+1] = NULL;
     struct dirent * currentFile;
 
     struct stat * stat_buffer;
+    //Maybe causing a seg fault maybe not
      stat_buffer = malloc(sizeof(struct stat)*1);
      //This part causes segfault
      //First opens directory then loops through all the files assining values then prints out
@@ -60,20 +61,17 @@ arg_ary[count+1] = NULL;
        currentFile = readdir(dir);
      //Get file name from readdir's dirent
        stat(currentFile->d_name,stat_buffer);
-       printf("xartgas");
-       printf("File Name: %s File Type: %d File Size: %ld \n", currentFile->d_name,currentFile->d_type,stat_buffer->st_size);
+       printf(" File Name: %s File Type: %d File Size: %ld \n", currentFile->d_name,currentFile->d_type,stat_buffer->st_size);
 
        }
 
 
 
-
-printf("Testing1");
   //Use while loop with readdir to display and for ncurses
-  initscr();
+//  initscr();
   //So you can use arrow keys and bakcpsace
   //stdscr is the default screen
-  keypad(stdscr,TRUE);
+//
 //End of setup
 
 
@@ -83,15 +81,15 @@ printf("Testing1");
 int main (){
   //Will be reponsibole for printing and editing and saving to maybe?
   char * editingBuffer = (char *) malloc(sizeof(char)* 8000);
-  char *inputBuffer;
-//  char  * argsArray[255];
-//  fgets(inputBuffer,255,stdin);
-  printf("x");
-//  parse_args(inputBuffer,argsArray);
-  display();
-//  if (argsArray[0] == "open"){
-  //  printf("successful");
-//  }
+  char inputBuffer[255];
+  char  * argsArray[255];
+    display();
+  fgets(inputBuffer,255,stdin);
+  parse_args(inputBuffer,argsArray);
+  if (argsArray[0] == "open"){
+    printf("opening: %s",argsArray[1]);
+  //  opensss(,argsArray);
+  }//
 
 
 
@@ -101,7 +99,7 @@ int main (){
 
 
 //Opens a file and prints it out, will this allow it to edit?
- void opensss(char* f, char*fileString){
+ void opensss(int fileDescriptor, char*fileString){
    //Initial start up just prints everything
    int windowY = 0;
    int windowX = 0;
@@ -111,14 +109,21 @@ int main (){
    buffer = (char*) malloc(sizeof(char)* LINES);
    //Buffer for reading from input
    inputBuffer = (char*) malloc(sizeof(char) *LINES);
+ fopen(fileString, "w+");
+ initscr();
+ keypad(stdscr,TRUE);
 
- fopen(f, "w+");
 
-  while (buffer != "\0"){
+ for(int i = 0; i <LINES; i ++){
+//Reads up to Lines chars from the file
+    write(fileDescriptor,buffer,LINES);
 
 
-  }
+}
 
+
+
+ //Reading from file to buffer
 
   while (1) { //Allows us to move cursor (hopefully) using arrow keys
      char input;
@@ -188,24 +193,7 @@ void append(char s,char x[256]){
 //Upon typing the "" automatically saves changes made from window to file and closes the file
 void exitFile(char*f){
 
-
-
-
 endwin();
 
-
 //close(f);
-}
-
-// takes the input from stdin using fgets and runs the corresponding function
-//Probably using execvp
-void inputFile(){
-
-  while(1){
-
-  }
-
-
-
-
 }
