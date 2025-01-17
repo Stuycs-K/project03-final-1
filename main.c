@@ -21,6 +21,67 @@
  //What programs do we need on startup?
 
 
+ //Opens a file and prints it out, will this allow it to edit?
+  void opensss(int fileDescriptor, char*fileString){
+    //Initial start up just prints everything
+    int windowY = 0;
+    int windowX = 0;
+    char * buffer;
+    char * inputBuffer;
+    //Buffer for printing from opened file to screen
+    buffer = (char*) malloc(sizeof(char)* LINES);
+    //Buffer for reading from input
+    inputBuffer = (char*) malloc(sizeof(char) *LINES);
+  fopen(fileString, "w+");
+    keypad(stdscr,TRUE);
+  initscr();
+
+
+
+  for(int i = 0; i <LINES; i ++){
+ //Reads up to Lines chars from the file
+// printw("%d",i);
+     write(fileDescriptor,buffer,LINES);
+//     printw(buffer);
+ }
+
+
+
+  //Reading from file to buffer
+
+   while (1) { //Allows us to move cursor (hopefully) using arrow keys
+      int input;
+      input = getch();
+      if(input ==KEY_UP){
+        move(-1,0);
+      }
+      if(input ==KEY_DOWN){
+        move(1,0);
+      }
+      if(input== KEY_LEFT){
+        move(0,-1);
+      }
+      if(input == KEY_RIGHT){
+        move(0,-1);
+      }
+      else{
+        char s[1];
+        s[0]=input;
+        printw("%s",s);
+ // put that function here
+        //Should write in the file using buffer
+
+   }
+     refresh();
+    }
+
+
+  }
+
+
+
+
+
 //Parses args so that you can run it line should be from stdin
 
 void parse_args( char * line, char ** arg_ary ){
@@ -71,13 +132,18 @@ arg_ary[count+1] = NULL;
 int main (){
   //Will be reponsibole for printing and editing and saving to maybe?
   char * editingBuffer = (char *) malloc(sizeof(char)* 8000);
+  free(editingBuffer);
   char inputBuffer[255];
   char  * argsArray[255];
     display();
   fgets(inputBuffer,255,stdin);
   parse_args(inputBuffer,argsArray);
+  argsArray[1][strcspn(argsArray[1], "\n")] = 0;
+  printf("%s",argsArray[1]);
   if (strcmp("open",argsArray[0]) ==0){
     printf("opening: %s",argsArray[1]);
+   int fd= open(argsArray[1],O_CREAT |O_RDONLY);
+    opensss(fd,argsArray[1]);
   //  opensss(,argsArray);
   }//
 
@@ -86,65 +152,6 @@ int main (){
 }
 
 //Make size of file buffer max like 8k
-
-
-//Opens a file and prints it out, will this allow it to edit?
- void opensss(int fileDescriptor, char*fileString){
-   //Initial start up just prints everything
-   int windowY = 0;
-   int windowX = 0;
-   char * buffer;
-   char * inputBuffer;
-   //Buffer for printing from opened file to screen
-   buffer = (char*) malloc(sizeof(char)* LINES);
-   //Buffer for reading from input
-   inputBuffer = (char*) malloc(sizeof(char) *LINES);
- fopen(fileString, "w+");
- initscr();
- keypad(stdscr,TRUE);
-
-
- for(int i = 0; i <LINES; i ++){
-//Reads up to Lines chars from the file
-    write(fileDescriptor,buffer,LINES);
-    printw(buffer);
-
-}
-
-
-
- //Reading from file to buffer
-
-  while (1) { //Allows us to move cursor (hopefully) using arrow keys
-     char input;
-     input = getch();
-     if(input ==KEY_UP){
-       move(-1,0);
-     }
-     if(input ==KEY_DOWN){
-       move(1,0);
-     }
-     if(input== KEY_LEFT){
-       move(0,-1);
-     }
-     if(input == KEY_RIGHT){
-       move(0,-1);
-     }
-     else{
-       char s[1];
-       s[0]=input;
-       printw("%s",s);
-// put that function here
-       //Should write in the file using buffer
-
-  }
-    refresh();
-   }
-
-
-
-
- }
 
 
 
@@ -181,8 +188,10 @@ void append(char s,char x[256]){
 }
 
 //Upon typing the "" automatically saves changes made from window to file and closes the file
-void exitFile(char*f){
+void exitFile(char*f,int fd){
 
+
+close(fd);
 endwin();
 
 //close(f);
