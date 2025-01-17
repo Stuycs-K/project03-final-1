@@ -42,7 +42,7 @@ arg_ary[count+1] = NULL;
 
 }
 
-
+// Done for now
   //Displays all .txt files in the directory runs out startup
   void display(){
     //Setup
@@ -66,16 +66,6 @@ arg_ary[count+1] = NULL;
        }
 
 
-
-  //Use while loop with readdir to display and for ncurses
-//  initscr();
-  //So you can use arrow keys and bakcpsace
-  //stdscr is the default screen
-//
-//End of setup
-
-
-
 }
 
 int main (){
@@ -86,7 +76,7 @@ int main (){
     display();
   fgets(inputBuffer,255,stdin);
   parse_args(inputBuffer,argsArray);
-  if (argsArray[0] == "open"){
+  if (strcmp("open",argsArray[0]) ==0){
     printf("opening: %s",argsArray[1]);
   //  opensss(,argsArray);
   }//
@@ -117,7 +107,7 @@ int main (){
  for(int i = 0; i <LINES; i ++){
 //Reads up to Lines chars from the file
     write(fileDescriptor,buffer,LINES);
-
+    printw(buffer);
 
 }
 

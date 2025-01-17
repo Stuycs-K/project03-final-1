@@ -35,3 +35,11 @@ When testing got these errors, finished append code for when adding at the end o
   -Just need to finish buffers now
 
  1 hour total spent
+
+ ### 1/15/2024 - Worked on display
+  - Testing display worked but the text immediately disspapeared
+  - Was getting seg fault when testing on lab machine
+
+### 1/16/2024 - FInished display
+  - Fixed seg fault issue on lab machine because I didn't allocae memory for a buffers  
+  - Moved initscr and keyboard setup to another function as that was what was cuasing the previous dissappeance
