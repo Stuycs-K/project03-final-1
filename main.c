@@ -144,12 +144,23 @@ int main (){
   parse_args(inputBuffer,argsArray);
   argsArray[1][strcspn(argsArray[1], "\n")] = 0;
   printf("%s",argsArray[1]);
+
   if (strcmp("open",argsArray[0]) ==0){
-    printf("opening: %s",argsArray[1]);
-   int fd= open(argsArray[1],O_CREAT |O_RDONLY);
-    opensss(fd,argsArray[1]);
+    struct stat buffer;
+   printf("opening or creating: %s",argsArray[1]);
+   if (stat(argsArray[1], &buffer) == 0) { //If the file already exists opens it
+     int fd= open(argsArray[1],O_CREAT |O_RDONLY);
+     opensss(fd,argsArray[1]);
+   }
+   else{ //if it dne then creates a new file
+     int fd = open(argsArray[1], O_CREAT | O_WRONLY, S_IRUSR | S_IWUSR);
+    opensss(fd, argsArray[1]);
+   }
+
+
   //  opensss(,argsArray);
-  }//
+  }
+  //
 
 
 

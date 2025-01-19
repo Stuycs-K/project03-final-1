@@ -43,3 +43,11 @@ When testing got these errors, finished append code for when adding at the end o
 ### 1/16/2024 - FInished display
   - Fixed seg fault issue on lab machine because I didn't allocae memory for a buffers  
   - Moved initscr and keyboard setup to another function as that was what was cuasing the previous dissappeance
+
+### 1/17/2024 - More fixing
+  - Fixed issue in display that caused segfault
+  - Found issue when opening files that created new file with a newline character
+
+### 1/18/2024 - Bug fixing Displays
+  -Fixed issue with opens that caused arrow keys to not work
+  - Fixed issue with display that caused it to skip every second line
