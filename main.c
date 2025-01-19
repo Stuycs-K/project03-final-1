@@ -24,26 +24,31 @@
  //Opens a file and prints it out, will this allow it to edit?
   void opensss(int fileDescriptor, char*fileString){
     //Initial start up just prints everything
+    initscr();
+  keypad(stdscr,TRUE);
     int windowY = 0;
     int windowX = 0;
     char * buffer;
     char * inputBuffer;
+
     //Buffer for printing from opened file to screen
     buffer = (char*) malloc(sizeof(char)* LINES);
     //Buffer for reading from input
     inputBuffer = (char*) malloc(sizeof(char) *LINES);
-  fopen(fileString, "w+");
-    keypad(stdscr,TRUE);
-  initscr();
+  FILE * file=  fopen(fileString, "w+");
 
 
+  while (fgets(buffer, LINES, file)) {
+       printw("%s", buffer);
+   }
 
-  for(int i = 0; i <LINES; i ++){
+
+//  for(int i = 0; i <LINES; i ++){
  //Reads up to Lines chars from the file
-// printw("%d",i);
-     write(fileDescriptor,buffer,LINES);
+
+//     printw(fileDescriptor,buffer,LINES);
 //     printw(buffer);
- }
+// }
 
 
 
@@ -53,21 +58,21 @@
       int input;
       input = getch();
       if(input ==KEY_UP){
-        move(-1,0);
+        move(getcury(stdscr)-1,getcurx(stdscr));
       }
-      if(input ==KEY_DOWN){
-        move(1,0);
+      else if(input ==KEY_DOWN){
+        move(getcury(stdscr)+1,getcurx(stdscr));
       }
-      if(input== KEY_LEFT){
-        move(0,-1);
+      else if(input== KEY_LEFT){
+        move(getcury(stdscr),getcurx(stdscr)-1);
       }
-      if(input == KEY_RIGHT){
-        move(0,-1);
+      else if(input == KEY_RIGHT){
+        move(getcury(stdscr),getcurx(stdscr)+1);
       }
       else{
-        char s[1];
-        s[0]=input;
-        printw("%s",s);
+        printw("%c",input);
+        //Using fputc here or offset add/append?
+
  // put that function here
         //Should write in the file using buffer
 
@@ -118,8 +123,7 @@ arg_ary[count+1] = NULL;
      //This part causes segfault
      //First opens directory then loops through all the files assining values then prints out
      while((currentFile = readdir(dir)) != NULL){
-     //  printf("0");
-       currentFile = readdir(dir);
+
      //Get file name from readdir's dirent
        stat(currentFile->d_name,stat_buffer);
        printf(" File Name: %s File Type: %d File Size: %ld \n", currentFile->d_name,currentFile->d_type,stat_buffer->st_size);
@@ -193,6 +197,6 @@ void exitFile(char*f,int fd){
 
 close(fd);
 endwin();
-
+display();
 //close(f);
 }
