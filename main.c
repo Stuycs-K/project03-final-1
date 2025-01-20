@@ -21,6 +21,18 @@
  //What programs do we need on startup?
 
 
+void windowDelete(int x,int y, int numCols){
+  //For deleting chars in ncurses window should move everything to the left
+    for (int i = x; i < numCols - 1; ++i) {
+      chtype ch = mvinch(y,i+1);
+      mvaddch(y,i,ch);
+      refresh();
+  }
+move(y,x);
+refresh();
+}
+
+
  // Done for now
    //Displays all .txt files in the directory runs out startup
    void display(){
@@ -48,10 +60,10 @@
 
  //Upon typing the "" automatically saves changes made from window to file and closes the file
  void exitFile(FILE*f,int fd){
-
-
+endwin();
+fflush(f);
  fclose(f);
- endwin();
+
  display();
  //close(f);
  }
@@ -65,8 +77,6 @@
 
    buffer[len+2] = '\0';
    for (int i = len; i>= currentPos ;i--){
-     printf("%d i: %d \n" ,len-currentPos -i,i);
-     printf("Current pair; One in front: %c One that replaces it: %c \n",buffer[(len-currentPos) -i],buffer[len-(currentPos) -(i+1)]);
      //Should go backwards replacing current with the one before it
      buffer[i+1] = buffer[i];
 
@@ -97,7 +107,7 @@
   void opensss(int fileDescriptor, char*fileString){
     //Initial start up just prints everything
     initscr();
-  keypad(stdscr,TRUE);
+    keypad(stdscr,TRUE);
     int windowY = 0;
     int windowX = 0;
     char * buffer;
@@ -107,24 +117,15 @@
     buffer = (char*) malloc(sizeof(char)* LINES);
     //Buffer for reading from input
     inputBuffer = (char*) malloc(sizeof(char) *LINES);
-  FILE * file=  fopen(fileString, "r+");
-  while (fgets(buffer, LINES, file) !=NULL) {
+    FILE * file =  fopen(fileString, "r+");
+    //Prints out the file's contents
+    while (fgets(buffer, LINES, file) !=NULL) {
        printw("%s", buffer);
        refresh();
-   }
-
-
-//  for(int i = 0; i <LINES; i ++){
- //Reads up to Lines chars from the file
-
-//     printw(fileDescriptor,buffer,LINES);
-//     printw(buffer);
-// }
-
-
+     }
 
   //Reading from file to buffer
-
+//User input
    while (1) { //Allows us to move cursor (hopefully) using arrow keys
       int input;
       input = getch();
@@ -132,7 +133,7 @@
         move(getcury(stdscr)-1,getcurx(stdscr));
       }
       else if(input ==27){ //Exits when you hit esc
-        break;
+    //    break;
         exitFile(file,fileDescriptor);
       }
       else if(input ==KEY_DOWN){
@@ -144,12 +145,17 @@
       else if(input == KEY_RIGHT){
         move(getcury(stdscr),getcurx(stdscr)+1);
       }
-      else{
-      //  printw("%c",input);
-        //Using fputc here or offset add/append?
+      else if (input == 127 || input == KEY_BACKSPACE){
+        //For buffer not window editing
+      mvaddch(getcury(stdscr),getcurx(stdscr), ' ');
+      windowDelete(getcury(stdscr),getcurx(stdscr),LINES);
 
- // put that function here
-        //Should write in the file using buffer
+      }
+      else{
+        int currentPos = getcury(stdscr) * getcurx(stdscr);  // Get the current cursor position
+        offsetAdd((char)input, buffer, currentPos);  // Modify the buffer
+        fseek(file, 0, SEEK_SET);  // Go to the start of the file
+        fputs(buffer, file);  // Write the modified content to the file
    }
 
     }
@@ -193,7 +199,6 @@ int main (){
   fgets(inputBuffer,255,stdin);
   parse_args(inputBuffer,argsArray);
   argsArray[1][strcspn(argsArray[1], "\n")] = 0;
-  printf("%s",argsArray[1]);
 
   if (strcmp("open",argsArray[0]) ==0){
     struct stat buffer;
