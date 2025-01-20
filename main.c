@@ -1,13 +1,7 @@
 
 //Don't forget that coordinate system is (y,x) first
 
-//Difference between move and wmove: Move only uses the default window wmove can use anything else
-
-//https://www.youtube.com/watch?v=A5lX1h_2zy0
-//mvprintw may be useful (y,x,"%d",c,) goes to a place and prints
 // User Runs Program -> run display() -> user selects program to open -> File is opened and user should be able to interact with it -> user exits file and back to step 1
-//Total list of buffers needed: Buffer for printing from file to window, from input to file,
-
 
 #include <string.h>
 #include <stdlib.h>
@@ -60,9 +54,10 @@ refresh();
 
  //Upon typing the "" automatically saves changes made from window to file and closes the file
  void exitFile(FILE*f,int fd){
-endwin();
 fflush(f);
-// fclose(f);
+endwin();
+//
+ fclose(f);
 
  display();
  //close(f);
@@ -72,34 +67,35 @@ fflush(f);
 
 
  //Done
- void offsetAdd(char input, char* buffer, int currentPos){
- int len = strlen(buffer);
+ void offsetAdd(char input, FILE* file, long currentPos){
+   //Gets current file length
+ fseek(file,0,SEEK_END);
+ long len = ftell(file);
 
-   buffer[len+2] = '\0';
-   for (int i = len; i>= currentPos ;i--){
+//Part that reads file into a buffer +2 b/c of null terminating
+  fseek(file,0,SEEK_SET);
+  char* buffer=(char *)malloc(len +2);
+  fread(buffer,1,len,file);//Reads the file into buffer
+  if (currentPos >= len) {
+    // If the position is at or beyond the end, just append the input (Might take place of append)
+    buffer[len]=input;
+    buffer[len+1]='\0';
+  }
+
+
+  else for (int i = len -1; i>= currentPos ;i--){
      //Should go backwards replacing current with the one before it
      buffer[i+1] = buffer[i];
-
    }
- buffer[currentPos] = input;
- buffer[len+1]='\0';
+   buffer[currentPos] = input;
+//buffer[len+1]='\0';
+ fseek(file, 0, SEEK_SET);  // Goes back to the beginning of the file
+ fwrite(buffer, 1, len + 1, file);  // Write the new content (with the inserted character)
 
+ fflush(file);
+ free(buffer);
  }
 
-
-
-
- //Appends s to the end of the file NOT TO THE WINDOW
- //Need to change end
- //Done
- void append(char s,char x[256]){
-   int count =0;
-   while(x[count] != '\0'){
-     count +=1;
-   }
-   x[count] = s;
-   x[count+1]='\0';
- }
 
 
 
@@ -108,6 +104,8 @@ fflush(f);
     //Initial start up just prints everything
     initscr();
     keypad(stdscr,TRUE);
+    clear();
+    noecho();
     int windowY = 0;
     int windowX = 0;
     char * buffer;
@@ -133,8 +131,11 @@ fflush(f);
         move(getcury(stdscr)-1,getcurx(stdscr));
       }
       else if(input ==27){ //Exits when you hit esc
-    //    break;
-        exitFile(file,fileDescriptor);
+        break;
+        //exitFile(file,fileDescriptor);
+      }
+      else if (input=='\n'){
+      //  printw('\n');
       }
       else if(input ==KEY_DOWN){
         move(getcury(stdscr)+1,getcurx(stdscr));
@@ -147,26 +148,27 @@ fflush(f);
       }
       else if (input == 127 || input == KEY_BACKSPACE){
         //For buffer not window editing
-      mvaddch(getcury(stdscr),getcurx(stdscr), ' ');
-      windowDelete(getcury(stdscr),getcurx(stdscr) -1,LINES);
-
+      if (getcurx(stdscr)!=0){
+        int tempx = getcurx(stdscr);
+        int tempy = getcury(stdscr);
+        mvaddch(getcury(stdscr),getcurx(stdscr)-1, ' ');
+        windowDelete(getcury(stdscr),getcurx(stdscr)-1,COLS);
+        move(tempy,tempx);
       }
+    }
       else{
-        for (int i = getcurx(stdscr); i < LINES - 1; ++i) {
-          chtype ch = mvinch(getcury(stdscr),i+1);
-          mvaddch(getcury(stdscr),i,ch);
-          refresh();
-      }
-      move(y,x);
-      refresh();
-
-
-  //      fseek(file, 0, SEEK_SET);  // Go to the start of the file
-//        fputs(buffer, file);  // Write the modified content to the file
-   }
+      insch(input);
+      move(getcury(stdscr),getcurx(stdscr)+1);
+          // Window to string index = (Row times x) + col
+      int stringIndex = (getcury(stdscr) * COLS) + getcurx(stdscr);
+      offsetAdd(input, file, stringIndex);
+    //  fseek(file,stringIndex,SEEK_SET);
+    }
+         refresh();
 
     }
 refresh();
+exitFile(file,fileDescriptor);
 
   }
 
@@ -202,6 +204,8 @@ int main (){
   free(editingBuffer);
   char inputBuffer[255];
   char  * argsArray[255];
+
+while(1){
     display();
   fgets(inputBuffer,255,stdin);
   parse_args(inputBuffer,argsArray);
@@ -219,13 +223,20 @@ int main (){
     opensss(fd, argsArray[1]);
    }
 
+   }
+ else if   (strcmp("remove",argsArray[0]) ==0 || strcmp("delete",argsArray[0]) ==0){
+   execvp("rm",argsArray[1]);
+ }
+}
 
+
+free(inputBuffer);
   //  opensss(,argsArray);
   }
   //
 
 
 
-}
+
 
 //Make size of file buffer max like 8k

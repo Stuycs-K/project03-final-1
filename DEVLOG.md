@@ -51,3 +51,8 @@ When testing got these errors, finished append code for when adding at the end o
 ### 1/18/2024 - Bug fixing Displays
   -Fixed issue with opens that caused arrow keys to not work
   - Fixed issue with display that caused it to skip every second line
+
+### 1/19/2024 - New Function for Dlete, finished esc, uses for append and offsetAdd?
+  - Wrote windowdelete that shifted all chars in an ncurses window to the left from a deleted point
+  - exitFile works
+  - More testing shows that opens works
