@@ -21,13 +21,13 @@
  //What programs do we need on startup?
 
 
-void windowDelete(int x,int y, int numCols){
+void windowDelete(int y,int x, int numCols){
   //For deleting chars in ncurses window should move everything to the left
-    for (int i = x; i < numCols - 1; ++i) {
-      chtype ch = mvinch(y,i+1);
-      mvaddch(y,i,ch);
-      refresh();
-  }
+  for (int i = x; i < numCols - 1; ++i) {
+    chtype ch = mvinch(y,i+1);
+    mvaddch(y,i,ch);
+    refresh();
+}
 move(y,x);
 refresh();
 }
@@ -62,7 +62,7 @@ refresh();
  void exitFile(FILE*f,int fd){
 endwin();
 fflush(f);
- fclose(f);
+// fclose(f);
 
  display();
  //close(f);
@@ -148,14 +148,21 @@ fflush(f);
       else if (input == 127 || input == KEY_BACKSPACE){
         //For buffer not window editing
       mvaddch(getcury(stdscr),getcurx(stdscr), ' ');
-      windowDelete(getcury(stdscr),getcurx(stdscr),LINES);
+      windowDelete(getcury(stdscr),getcurx(stdscr) -1,LINES);
 
       }
       else{
-        int currentPos = getcury(stdscr) * getcurx(stdscr);  // Get the current cursor position
-        offsetAdd((char)input, buffer, currentPos);  // Modify the buffer
-        fseek(file, 0, SEEK_SET);  // Go to the start of the file
-        fputs(buffer, file);  // Write the modified content to the file
+        for (int i = getcurx(stdscr); i < LINES - 1; ++i) {
+          chtype ch = mvinch(getcury(stdscr),i+1);
+          mvaddch(getcury(stdscr),i,ch);
+          refresh();
+      }
+      move(y,x);
+      refresh();
+
+
+  //      fseek(file, 0, SEEK_SET);  // Go to the start of the file
+//        fputs(buffer, file);  // Write the modified content to the file
    }
 
     }
