@@ -56,3 +56,10 @@ When testing got these errors, finished append code for when adding at the end o
   - Wrote windowdelete that shifted all chars in an ncurses window to the left from a deleted point
   - exitFile works
   - More testing shows that opens works
+### 1/20/2024 - More final bug fixing
+  - Testing shows that editing file and writing to it's possible
+  - Merged append's functionality into offsetAdd
+  - Changed offsetAdd to work for files as previously only worked for char pointers
+  - Fixed double input appearing in ncurses window by using noecho
+  - We have no scroll functionality
+  - 13 hours spent

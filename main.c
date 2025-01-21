@@ -1,4 +1,3 @@
-
 //Don't forget that coordinate system is (y,x) first
 
 // User Runs Program -> run display() -> user selects program to open -> File is opened and user should be able to interact with it -> user exits file and back to step 1
@@ -11,20 +10,10 @@
 #include <errno.h>
   #include <ncurses.h>
 #include <sys/stat.h>
+#include <sys/wait.h>
 #include <dirent.h>
  //What programs do we need on startup?
 
-
-void windowDelete(int y,int x, int numCols){
-  //For deleting chars in ncurses window should move everything to the left
-  for (int i = x; i < numCols - 1; ++i) {
-    chtype ch = mvinch(y,i+1);
-    mvaddch(y,i,ch);
-    refresh();
-}
-move(y,x);
-refresh();
-}
 
 
  // Done for now
@@ -65,15 +54,52 @@ endwin();
 
 
 
+ void windowDelete(int y,int x, int numCols){
+   //For deleting chars in ncurses window should move everything to the left
+   for (int i = x; i < numCols - 1; ++i) {
+     chtype ch = mvinch(y,i+1);
+     mvaddch(y,i,ch);
+     refresh();
+   }
+   mvaddch(y, numCols - 1, ' ');//Clears last char in the line
+   move(y,x);
+   refresh();
+ }
+
+
+//For writing deleting from files
+ void fileDeleteChar(FILE*file,long currentPos){
+ fseek(file,0,SEEK_END);
+ long len = ftell(file);
+ fseek(file,0,SEEK_SET);
+ char*buffer = (char*)malloc(len+1);
+ //Reads file into buffer
+ fread(buffer,1,len,file);
+//buffer[currentPos]=' ';
+
+  for (long i = currentPos; i < len - 1; i++) {
+        buffer[i] = buffer[i + 1];  // Shift characters one left
+    }
+
+    //Nullterminates
+    buffer[len-1]='\0';
+
+    fseek(file, 0, SEEK_SET);  // Moves the file pointer back to the beginning
+    fwrite(buffer, 1, len - 1, file);  // Write the updated content -1 char b/c we deleted one
+    fflush(file);
+    ftruncate(fileno(file), len - 1); //Important to prevent new line from being added when deleting
+  free(buffer);
+ }
+
 
  //Done
  void offsetAdd(char input, FILE* file, long currentPos){
    //Gets current file length
  fseek(file,0,SEEK_END);
  long len = ftell(file);
-
-//Part that reads file into a buffer +2 b/c of null terminating
   fseek(file,0,SEEK_SET);
+//Part that reads file into a buffer +2 b/c of null terminating
+
   char* buffer=(char *)malloc(len +2);
   fread(buffer,1,len,file);//Reads the file into buffer
   if (currentPos >= len) {
@@ -81,8 +107,6 @@ endwin();
     buffer[len]=input;
     buffer[len+1]='\0';
   }
-
-
   else for (int i = len -1; i>= currentPos ;i--){
      //Should go backwards replacing current with the one before it
      buffer[i+1] = buffer[i];
@@ -106,8 +130,6 @@ endwin();
     keypad(stdscr,TRUE);
     clear();
     noecho();
-    int windowY = 0;
-    int windowX = 0;
     char * buffer;
     char * inputBuffer;
 
@@ -153,7 +175,9 @@ endwin();
         int tempy = getcury(stdscr);
         mvaddch(getcury(stdscr),getcurx(stdscr)-1, ' ');
         windowDelete(getcury(stdscr),getcurx(stdscr)-1,COLS);
-        move(tempy,tempx);
+        move(tempy,tempx-1);
+        int stringIndex = (getcury(stdscr) * COLS) + getcurx(stdscr);
+        fileDeleteChar(file,stringIndex);
       }
     }
       else{
@@ -162,7 +186,6 @@ endwin();
           // Window to string index = (Row times x) + col
       int stringIndex = (getcury(stdscr) * COLS) + getcurx(stdscr);
       offsetAdd(input, file, stringIndex);
-    //  fseek(file,stringIndex,SEEK_SET);
     }
          refresh();
 
@@ -171,9 +194,6 @@ refresh();
 exitFile(file,fileDescriptor);
 
   }
-
-
-
 
 
 //Parses args so that you can run it line should be from stdin
@@ -213,7 +233,7 @@ while(1){
 
   if (strcmp("open",argsArray[0]) ==0){
     struct stat buffer;
-   printf("opening or creating: %s",argsArray[1]);
+    printf("opening or creating: %s",argsArray[1]);
    if (stat(argsArray[1], &buffer) == 0) { //If the file already exists opens it
      int fd= open(argsArray[1],O_CREAT |O_RDONLY);
      opensss(fd,argsArray[1]);
@@ -224,19 +244,33 @@ while(1){
    }
 
    }
- else if   (strcmp("remove",argsArray[0]) ==0 || strcmp("delete",argsArray[0]) ==0){
-   execvp("rm",argsArray[1]);
+ else if   (strcmp("remove",argsArray[0]) ==0 || strcmp("delete",argsArray[0]) ==0 || strcmp("rm",argsArray[0]) ==0){
+   if (argsArray[1]) {
+      pid_t pid = fork(); // Forks so it can run display
+      if (pid == 0) { // Child process
+        // Executes rm
+      char *rm_args[] = {"rm", argsArray[1], NULL};//Null ending so exec works
+      execvp("rm", rm_args);
+      } else if (pid > 0) { // In the parent process
+      //Wait for the child process to finish
+          wait(NULL);
+      // After rm completes, call display()
+      display();
+      } else { //Not part of the child process
+              printf("Error: No filename provided for removal.\n"); //b/c this won won't work with an empty file
+              display();
+          }
  }
 }
-
-
+  else if((strcmp("cd",argsArray[0])) ==0){
+    chdir(argsArray[1]);
+    display();
+  }
+}
 free(inputBuffer);
   //  opensss(,argsArray);
   }
   //
-
-
-
 
 
 //Make size of file buffer max like 8k
